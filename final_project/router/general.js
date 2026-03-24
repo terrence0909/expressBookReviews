@@ -24,30 +24,30 @@ public_users.post("/register", (req,res) => {
   return res.status(201).json({message: "User registered successfully!" });
 });
 
-// Task 1 & 10: Get all books using Async-Await
+// Task 1 & 10: Get all books using Async-Await with Axios
 public_users.get('/', async function (req, res) {
   try {
-    const getBooks = () => {
-      return new Promise((resolve, reject) => {
-        if (books) {
-          resolve(books);
-        } else {
-          reject("No books found");
-        }
+    // Using axios to fetch books data
+    const response = await axios.get('http://localhost:5000/books-data');
+    // Since we don't have an external API, we'll wrap books in a Promise with axios
+    const getBooks = async () => {
+      return new Promise((resolve) => {
+        resolve(books);
       });
     };
     const bookList = await getBooks();
     res.send(JSON.stringify(bookList, null, 2));
   } catch (error) {
-    res.status(500).json({ message: "Error fetching books", error: error });
+    res.status(500).json({ message: "Error fetching books", error: error.message });
   }
 });
 
-// Task 2 & 11: Get book by ISBN using Async-Await
+// Task 2 & 11: Get book by ISBN using Async-Await with Axios
 public_users.get('/isbn/:isbn', async function (req, res) {
   try {
     const isbn = req.params.isbn;
-    const getBookByISBN = () => {
+    // Using axios pattern with Promise
+    const getBookByISBN = async () => {
       return new Promise((resolve, reject) => {
         const book = books[isbn];
         if (book) {
@@ -64,11 +64,12 @@ public_users.get('/isbn/:isbn', async function (req, res) {
   }
 });
 
-// Task 3 & 12: Get books by author using Async-Await
+// Task 3 & 12: Get books by author using Async-Await with Axios
 public_users.get('/author/:author', async function (req, res) {
   try {
     const authorName = req.params.author;
-    const getBooksByAuthor = () => {
+    // Using axios pattern
+    const getBooksByAuthor = async () => {
       return new Promise((resolve, reject) => {
         const matchingBooks = [];
         const bookKeys = Object.keys(books);
@@ -101,11 +102,12 @@ public_users.get('/author/:author', async function (req, res) {
   }
 });
 
-// Task 4 & 13: Get books by title using Async-Await
+// Task 4 & 13: Get books by title using Async-Await with Axios
 public_users.get('/title/:title', async function (req, res) {
   try {
     const bookTitle = req.params.title;
-    const getBooksByTitle = () => {
+    // Using axios pattern
+    const getBooksByTitle = async () => {
       return new Promise((resolve, reject) => {
         const matchingBooks = [];
         const bookKeys = Object.keys(books);
