@@ -6,21 +6,17 @@ let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
 public_users.post("/register", (req,res) => {
-  // Get username and password from request parameters
   const username = req.body.username;
   const password = req.body.password;
 
-  // Check if username and password are provided
   if (!username || !password) {
     return res.status(400).json({ message: "Username and password are required." });
   }
 
-  // Check if username already exists
   if (isValid(username)) {
     return res.status(409).json({ message: "Username already exists. Please provide a different username" });
   }
 
-  // Register the new user
   users.push({
     username: username,
     password: password
@@ -28,10 +24,9 @@ public_users.post("/register", (req,res) => {
   return res.status(201).json({message: "User registered successfully!" });
 });
 
-// Task 10: Get the book list using Async-Await with Axios
-public_users.get('/async-books', async function (req, res) {
+// Task 1 & 10: Get all books using Async-Await
+public_users.get('/', async function (req, res) {
   try {
-    // Simulate async operation to get books
     const getBooks = () => {
       return new Promise((resolve, reject) => {
         if (books) {
@@ -41,7 +36,6 @@ public_users.get('/async-books', async function (req, res) {
         }
       });
     };
-    
     const bookList = await getBooks();
     res.send(JSON.stringify(bookList, null, 2));
   } catch (error) {
@@ -49,18 +43,11 @@ public_users.get('/async-books', async function (req, res) {
   }
 });
 
-// Task 1: Original sync version (keeping for backward compatibility)
-public_users.get('/', function (req, res) {
-  res.send(JSON.stringify(books, null, 2));
-});
-
-// Task 11: Get book details based on ISBN using Async-Await
-public_users.get('/async-isbn/:isbn', async function (req, res) {
+// Task 2 & 11: Get book by ISBN using Async-Await
+public_users.get('/isbn/:isbn', async function (req, res) {
   try {
     const isbn = req.params.isbn;
-    
-    // Simulate async operation to get book by ISBN
-    const getBookByISBN = (isbn) => {
+    const getBookByISBN = () => {
       return new Promise((resolve, reject) => {
         const book = books[isbn];
         if (book) {
@@ -70,35 +57,18 @@ public_users.get('/async-isbn/:isbn', async function (req, res) {
         }
       });
     };
-    
-    const book = await getBookByISBN(isbn);
+    const book = await getBookByISBN();
     res.send(JSON.stringify(book, null, 2));
   } catch (error) {
     res.status(404).json({ message: "Book not found with ISBN: " + req.params.isbn });
   }
 });
 
-// Task 2: Original sync version (keeping for backward compatibility)
-public_users.get('/isbn/:isbn', function (req, res) {
-  // Get ISBN from request parameters
-  const isbn = req.params.isbn;
-  const book = books[isbn];
-
-  // Check if book exists
-  if (book) {
-    res.send(JSON.stringify(book, null, 2));
-  } else {
-    res.status(404).json({ message: "Books not found with ISBN: " + isbn });
-  }
-});
-
-// Task 12: Get book details based on author using Async-Await
-public_users.get('/async-author/:author', async function (req, res) {
+// Task 3 & 12: Get books by author using Async-Await
+public_users.get('/author/:author', async function (req, res) {
   try {
     const authorName = req.params.author;
-    
-    // Simulate async operation to get books by author
-    const getBooksByAuthor = (authorName) => {
+    const getBooksByAuthor = () => {
       return new Promise((resolve, reject) => {
         const matchingBooks = [];
         const bookKeys = Object.keys(books);
@@ -124,52 +94,18 @@ public_users.get('/async-author/:author', async function (req, res) {
         }
       });
     };
-    
-    const booksByAuthor = await getBooksByAuthor(authorName);
+    const booksByAuthor = await getBooksByAuthor();
     res.send(JSON.stringify(booksByAuthor, null, 2));
   } catch (error) {
     res.status(404).json({ message: "No books found by author: " + req.params.author });
   }
 });
 
-// Task 3: Original sync version (keeping for backward compatibility)
-public_users.get('/author/:author', function (req, res) {
-  // Get author name from request parameter
-  const authorName = req.params.author;
-  const matchingBooks = [];
-
-  // Get all book keys (ISBNs)
-  const bookKeys = Object.keys(books);
-
-  // Iterate through books and find matches by author
-  for (let i = 0; i < bookKeys.length; i++) {
-    const isbn = bookKeys[i];
-    const book = books[isbn];
-
-    if (book.author === authorName) {
-        matchingBooks.push({
-            isbn: isbn,
-            title: book.title,
-            author: book.author,
-            reviews: book.reviews
-        });
-    }
-  }
-  // Check if any books were found
-  if (matchingBooks.length > 0) {
-    res.send(JSON.stringify(matchingBooks, null, 2));
-  } else {
-    res.status(404).json({ message: "No books found by author: " + authorName });
-  }
-});
-
-// Task 13: Get book details based on title using Async-Await
-public_users.get('/async-title/:title', async function (req, res) {
+// Task 4 & 13: Get books by title using Async-Await
+public_users.get('/title/:title', async function (req, res) {
   try {
     const bookTitle = req.params.title;
-    
-    // Simulate async operation to get books by title
-    const getBooksByTitle = (bookTitle) => {
+    const getBooksByTitle = () => {
       return new Promise((resolve, reject) => {
         const matchingBooks = [];
         const bookKeys = Object.keys(books);
@@ -195,54 +131,19 @@ public_users.get('/async-title/:title', async function (req, res) {
         }
       });
     };
-    
-    const booksByTitle = await getBooksByTitle(bookTitle);
+    const booksByTitle = await getBooksByTitle();
     res.send(JSON.stringify(booksByTitle, null, 2));
   } catch (error) {
     res.status(404).json({ message: "No books found with title: " + req.params.title });
   }
 });
 
-// Task 4: Original sync version (keeping for backward compatibility)
-public_users.get('/title/:title', function (req, res) {
-  // Get title from request parameters
-  const bookTitle = req.params.title;
-  const matchingBooks = [];
-
-  // Get all book keys (ISBNs)
-  const bookKeys = Object.keys(books);
-
-  // Iterate through books and find matches by title
-  for (let i = 0; i < bookKeys.length; i++){
-    const isbn = bookKeys[i];
-    const book = books[isbn];
-
-    if (book.title === bookTitle) {
-        matchingBooks.push({
-            isbn: isbn,
-            title: book.title,
-            author: book.author,
-            reviews: book.reviews
-        });
-    }
-  }
-  // Check if any books were found
-  if (matchingBooks.length > 0) {
-    res.send(JSON.stringify(matchingBooks, null, 2));
-  } else {
-    res.status(404).json({ message: "No books were found with title: " + bookTitle });
-  }
-});
-
 // Task 5: Get book review
 public_users.get('/review/:isbn', function (req, res) {
-  // Get ISBN from request parameters
   const isbn = req.params.isbn;
   const book = books[isbn];
 
-  // Check if book exists
   if (book) {
-    // Check if reviews exist and are not empty
     if (book.reviews && Object.keys(book.reviews).length > 0) {
         res.send(JSON.stringify(book.reviews, null, 2));
     } else {
